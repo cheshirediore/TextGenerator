@@ -75,6 +75,10 @@ class TextRepeater:
     def set_format_options(self, format_options):
         self.format_options = format_options
         return True
+    
+    def set_format_options_from_list(self, format_options):
+        self.format_options = [(x,) for x in format_options]
+        return True
 
     def set_section_header(self, section_header):
         self.section_header = section_header
@@ -90,6 +94,14 @@ class TextRepeater:
 
     def set_footer(self, footer):
         self.footer = footer
+        return True
+    
+    def set_indentation(self, indentation):
+        self.indentation = indentation
+        return True
+
+    def set_separator(self, separator):
+        self.separator = separator
         return True
 
     ## Getters ##
@@ -111,12 +123,38 @@ class TextRepeater:
     def get_footer(self):
         return self.footer
     
+    def get_indentation(self):
+        return self.indentation
+
+    def get_separator(self):
+        return self.separator
+    
     def get_text(self):
         return self.text
     
     ## Behavior ##
     def build_section(self, fopt):
-        return self.section_header + self.section_body.format(fopt) + self.section_footer
+        section_list = []
+        # Only add the section header if it exists
+        if self.section_header:
+            section_header = self.section_header.format(*fopt)
+            section_list.append(section_header)
+        # Only add the section body if it exists  
+        if self.section_body:
+            section_body = self.section_body.format(*fopt)
+            section_list.append(section_body)
+        # Only add the section footer if it exists    
+        if self.section_footer:
+            section_footer = self.section_footer.format(*fopt)
+            section_list.append(section_footer)
+        if section_list:
+            section = '\n'.join(section_list)
+            return self.indent(section)
+        else:
+            return ''
+    
+    def indent(self, s):
+        return ' '*self.indentation + s.replace('\n', '\n'+' '*self.indentation)
     
     def build_text(self):
         # This list will be .join()ed into a string later with self.separator
@@ -126,15 +164,9 @@ class TextRepeater:
             text_list.append(self.header)
         # Iterate over the format options, building a section for each
         for opts in self.format_options:
-            # Only add the section header if it exists
-            if self.section_header:
-                text_list.append(self.section_header)
-            # Only add the section body if it exists  
-            if self.section_body:
-                text_list.append(self.section_body.format(*opts))
-            # Only add the section footer if it exists    
-            if self.section_footer:
-                text_list.append(self.section_footer)
+            section = self.build_section(opts)
+            if section:
+                text_list.append(section)
         # Add the footer at the end of the list
         if self.footer:
             text_list.append(self.footer)
@@ -142,6 +174,8 @@ class TextRepeater:
         if text_list:
             # Update text attribute with built text
             self.text = self.separator.join(text_list)
+            # text = self.separator.join(text_list)
+            # self.text = text.replace('\n', '\n'+' '*self.indentation)
             # If it makes it here, indicate success
             return True
         else:
@@ -165,13 +199,32 @@ class TextRepeater:
         """
         Returns the built text
         """
-        # return '%s + i%s' % (self.real, self.imag)
         return self.text
 
 
 if __name__ == '__main__':
-    import inspect
+    ## Tests ##
     repeater = TextRepeater()
+
+    # format_options = [('format_options'.upper(),) for i in range(10)]
+    format_options = [(str(i),) for i in range(10)]
+    header = 'header'.upper()+'\n'+'-'*80
+    section_header = 'section_header {}'.upper()
+    section_body = 'section_body {}'.upper()
+    section_footer = 'section_footer {}'.upper()
+    footer = '-'*80+'\n'+'footer'.upper()
+    indentation = 4
+    separator = '\n'
+
+    repeater.set_format_options(format_options)
+    repeater.set_header(header)
+    repeater.set_section_header(section_header)
+    repeater.set_section_body(section_body)
+    repeater.set_section_footer(section_footer)
+    repeater.set_footer(footer)
+    repeater.set_indentation(indentation)
+    repeater.set_separator(separator)
     
-    for i in inspect.getmembers(repeater, inspect.ismethod):
-        print(i)
+    repeater.build_text()
+    
+    print(repeater)

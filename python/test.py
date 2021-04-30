@@ -1,47 +1,63 @@
 from TextRepeater import TextRepeater
 
-if __name__ == '__main__':
-    """
-    This isn't the best way to actually use this class. This is for testing, not an example of proper use.
-    """
-    items = ['format_options'
-            ,'indentation'
-            ,'header'
-            ,'format_options'
-            ,'section_header'
-            ,'section_body'
-            ,'section_footer'
-            ,'footer'
-            ,'text']
+## Test 1: Plain Text ##
+print('Test 1: Plain Text')
 
-    repeater = TextRepeater()
-    
-    body = 'def {0}{1}(self, {1}):\n    self.{1} = {1}\n    return True\n'
-    # body = 'def {0}{1}(self, {1}):\n    return self.{1}\n'
-    
-    format_options = [('set_',x) for x in items]
-    for i in format_options:
-        print(i)
-    
-    # Set repeater attributes
-    repeater.set_format_options(format_options)
+repeater = TextRepeater()
 
-    repeater.set_header('## Setters ##')
-    
-    repeater.set_section_body(body)
-    repeater.set_section_footer = '\n'
-    
-    # repeater.set_footer('')
-    
-    
-    repeater.build_text()
-    
-    # print('repeater.get_format_options()\n',repeater.get_format_options())
-    # print('repeater.get_header()\n',repeater.get_header())
-    # print('repeater.get_section_header()\n',repeater.get_section_header())
-    # print('repeater.get_section_body()\n',repeater.get_section_body())
-    # print('repeater.get_section_footer()\n',repeater.get_section_footer())
-    # print('repeater.get_footer()\n',repeater.get_footer())
-    # print('repeater.get_text()\n',repeater.get_text())
-    
-    repeater.to_file('test.txt')
+# format_options = [('format_options'.upper(),) for i in range(10)]
+format_options = [(str(i),) for i in range(10)]
+header = 'header'.upper()+'\n'+'-'*80
+section_header = 'section_header {}'.upper()
+section_body = 'section_body {}'.upper()
+section_footer = 'section_footer {}'.upper()
+footer = '-'*80+'\n'+'footer'.upper()
+indentation = 4
+separator = '\n'
+
+repeater.set_format_options(format_options)
+repeater.set_header(header)
+repeater.set_section_header(section_header)
+repeater.set_section_body(section_body)
+repeater.set_section_footer(section_footer)
+repeater.set_footer(footer)
+repeater.set_indentation(indentation)
+repeater.set_separator(separator)
+
+repeater.build_text()
+
+repeater.to_file('Test1.txt')
+print('-'*80)
+
+## Test 2: Transact-SQL ##
+print('Test 2: Transact-SQL')
+
+repeater = TextRepeater()
+
+format_options= [
+     ('dbo.[tbl_Person]', 'full_name')
+    ,('dbo.[tbl_Book]'  , 'author_name')
+    ,('dbo.[tbl_Song]'  , 'artist_name')
+]
+header = "PRINT CONCAT(GETDATE(), '  START');" + '\n'+'-'*80
+section_header = "\nPRINT CONCAT(GETDATE(), '  BEGIN UPDATING {0}');\nGO\n"
+section_body = """UPDATE {0}
+SET [{1}] = UPPER([{1}]);"""
+section_footer = "\nPRINT CONCAT(GETDATE(), '  FINISHED UPDATING {0}');\nGO\n"
+footer = '-'*80+'\n' + "PRINT CONCAT(GETDATE(), '  END');\nGO\n"
+indentation = 2
+separator = '\n'
+
+repeater.set_format_options(format_options)
+repeater.set_header(header)
+repeater.set_section_header(section_header)
+repeater.set_section_body(section_body)
+repeater.set_section_footer(section_footer)
+repeater.set_footer(footer)
+repeater.set_indentation(indentation)
+repeater.set_separator(separator)
+
+repeater.build_text()
+
+repeater.to_file('Test2.sql')
+print('-'*80)
