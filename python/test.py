@@ -13,7 +13,7 @@ section_body = 'section_body {}'.upper()
 section_footer = 'section_footer {}'.upper()
 footer = '-'*80+'\n'+'footer'.upper()
 indentation = 4
-separator = '\n'
+separator = '\n'+'-'*80+'\n'
 
 repeater.set_format_options(format_options)
 repeater.set_header(header)
@@ -40,13 +40,13 @@ format_options= [
     ,('dbo.[tbl_Song]'  , 'artist_name')
 ]
 header = "PRINT CONCAT(GETDATE(), '  START');" + '\n'+'-'*80
-section_header = "\nPRINT CONCAT(GETDATE(), '  BEGIN UPDATING {0}');\nGO\n"
+section_header = "PRINT CONCAT(GETDATE(), '  BEGIN UPDATING {0}');\nGO\n"
 section_body = """UPDATE {0}
 SET [{1}] = UPPER([{1}]);"""
 section_footer = "\nPRINT CONCAT(GETDATE(), '  FINISHED UPDATING {0}');\nGO\n"
-footer = '-'*80+'\n' + "PRINT CONCAT(GETDATE(), '  END');\nGO\n"
+footer = '-'*80+'\n' + "PRINT CONCAT(GETDATE(), '  END');\nGO"
 indentation = 2
-separator = '\n'
+separator = '\n'+'-'*80+'\n'
 
 repeater.set_format_options(format_options)
 repeater.set_header(header)
